@@ -96,6 +96,11 @@ scripts/
 binaries are occasionally not installed. On non-Windows machines npm skips them
 automatically.
 
+## Support & feedback
+
+Questions, bugs, or feature requests? Email **contact@jackalope.dev**
+(there's also a link in the extension popup).
+
 ## Disclaimer
 
 This is an independent, fan-made tool. It is **not affiliated with, endorsed by,

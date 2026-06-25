@@ -142,10 +142,24 @@ body {
 .foot {
   margin-top: 14px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   font-size: 11.5px;
   color: var(--muted);
+}
+.foot-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.contact {
+  color: var(--muted);
+  text-decoration: none;
+}
+.contact:hover {
+  color: var(--accent-bright);
+  text-decoration: underline;
 }
 kbd {
   background: var(--track);
