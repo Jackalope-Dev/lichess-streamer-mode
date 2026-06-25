@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lichess Streamer Mode</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header class="head">
+        <div class="logo" aria-hidden="true">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+        </div>
+        <div class="titles">
+          <h1>Streamer Mode</h1>
+          <p class="sub">for Lichess</p>
+        </div>
+      </header>
+
+      <button id="toggle" class="toggle" role="switch" aria-checked="false">
+        <span class="knob"></span>
+        <span class="state" id="state-label">Off</span>
+      </button>
+
+      <p class="hint" id="hint">
+        Usernames are visible. Click to hide them on stream.
+      </p>
+
+      <ul class="legend">
+        <li><b>You</b> → <span class="pill">Streamer</span></li>
+        <li><b>Opponent</b> → <span class="pill">Opponent</span></li>
+        <li><b>Everyone else</b> → <span class="pill">Player&nbsp;N</span></li>
+      </ul>
+
+      <a
+        id="donate"
+        class="donate"
+        href="https://ko-fi.com/jackalope_digital"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="heart" aria-hidden="true">♥</span>
+        Support this extension
+      </a>
+
+      <footer class="foot">
+        <span>Toggle anytime with</span>
+        <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>H</kbd>
+      </footer>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
