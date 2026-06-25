@@ -3,7 +3,7 @@ import { defineConfig } from 'wxt';
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   manifest: {
-    name: 'Lichess Streamer Mode',
+    name: 'Streamer Mode for Lichess',
     // Keep <= 132 chars: Chrome Web Store enforces this on the manifest
     // description. The longer marketing copy lives in the store listing.
     description:
@@ -11,7 +11,7 @@ export default defineConfig({
     permissions: ['storage'],
     // Action title shows in the toolbar tooltip.
     action: {
-      default_title: 'Lichess Streamer Mode',
+      default_title: 'Streamer Mode for Lichess',
     },
     commands: {
       'toggle-streamer-mode': {
@@ -19,7 +19,7 @@ export default defineConfig({
           default: 'Ctrl+Shift+H',
           mac: 'Command+Shift+H',
         },
-        description: 'Toggle Lichess Streamer Mode on/off',
+        description: 'Toggle Streamer Mode for Lichess on/off',
       },
     },
     browser_specific_settings: {
