@@ -3,7 +3,7 @@
 
   # Streamer Mode for Lichess
 
-  [![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4sCIILO7Ok2XaiUa.png)](https://chromewebstore.google.com/detail/streamer-mode-for-lichess/geeapagaajpjlnenfongaecamhknbokc)
+  [![Available in the Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/streamer-mode-for-lichess/geeapagaajpjlnenfongaecamhknbokc)
 </div>
 
 A cross-browser extension that hides **every username** on [lichess.org](https://lichess.org)
