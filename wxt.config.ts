@@ -27,6 +27,12 @@ export default defineConfig({
     browser_specific_settings: {
       gecko: {
         id: 'lichess-streamer-mode@cadenmackenzie',
+        // Firefox now requires an explicit data-collection declaration. This
+        // extension collects and transmits no data whatsoever — everything
+        // happens locally in the page — so we declare "none".
+        data_collection_permissions: {
+          required: ['none'],
+        },
       },
     },
   },
