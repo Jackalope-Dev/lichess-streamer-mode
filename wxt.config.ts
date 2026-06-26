@@ -15,9 +15,11 @@ export default defineConfig({
     },
     commands: {
       'toggle-streamer-mode': {
+        // Alt+Shift+S: cross-browser safe. We avoid Ctrl+Shift+H because that
+        // is Firefox's built-in Library/History shortcut and never reaches us.
         suggested_key: {
-          default: 'Ctrl+Shift+H',
-          mac: 'Command+Shift+H',
+          default: 'Alt+Shift+S',
+          mac: 'Alt+Shift+S',
         },
         description: 'Toggle Streamer Mode for Lichess on/off',
       },

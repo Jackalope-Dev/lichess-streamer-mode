@@ -35,23 +35,9 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 9px;
-  background: var(--bg);
-  border: 2px solid var(--accent);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 0 7px;
+  display: block;
   flex: none;
 }
-
-.bar {
-  height: 5px;
-  border-radius: 2px;
-  background: var(--text);
-}
-.bar-1 { width: 100%; }
-.bar-2 { width: 62%; }
 
 .titles h1 {
   font-size: 16px;
@@ -88,12 +74,14 @@ body {
   height: 40px;
   border-radius: 9px;
   background: #fff;
-  transition: transform 0.2s ease;
+  transition: left 0.2s ease;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
+/* Slide to the right edge, leaving a 6px gap — robust to any popup width
+   (40px knob + 6px gap = 46px inset from the right). */
 .toggle.on .knob {
-  transform: translateX(222px);
+  left: calc(100% - 46px);
 }
 
 .state {

@@ -21,7 +21,8 @@ It also:
 - Survives Lichess's single-page navigation via a `MutationObserver`.
 - Is **fully reversible** — turning it off restores the original page instantly, no reload.
 
-Toggle from the toolbar popup, or with **Ctrl+Shift+H** (⌘+Shift+H on macOS) mid-game.
+Toggle from the toolbar popup, or with **Alt+Shift+S** mid-game (remappable at
+`about:addons` → Manage Extension Shortcuts in Firefox, or `chrome://extensions/shortcuts` in Chrome).
 
 ## Donations
 
