@@ -84,6 +84,12 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Strings we hand out as aliases. We must never mistake one of these for a real
+// username when reading text we (or a stale previous session) already masked —
+// otherwise the real name is lost and the corruption compounds across toggles.
+const OWN_ALIAS_RE = /^(?:Streamer|Opponent|Player \d+)$/;
+const isOwnAlias = (s: string): boolean => OWN_ALIAS_RE.test(s.trim());
+
 interface Record_ {
   real: string;
   alias: string;
@@ -142,16 +148,32 @@ export class LichessMasker {
     this.observer?.disconnect();
     this.observer = null;
 
-    for (const [el, rec] of this.records) {
+    // Reverse EVERY element we touched: those we recorded, PLUS any element
+    // still in the live DOM bearing our markers. The latter covers elements
+    // that Lichess re-rendered into place after we recorded them, so nothing
+    // is left showing an alias. Text is reversed using the alias we assigned
+    // to that real name (from the record, or looked up by real name).
+    const elems = new Set<HTMLElement>(this.records.keys());
+    document
+      .querySelectorAll<HTMLElement>(`[${REAL_ATTR}], [${DONE_ATTR}]`)
+      .forEach((el) => elems.add(el));
+
+    for (const el of elems) {
       try {
-        // reverse the text: alias -> real
-        this.replaceText(el, rec.alias, rec.real);
-        // restore scrubbed attributes
-        for (const attr of SCRUB_ATTRS) {
-          const orig = rec.attrs[attr];
-          if (orig === undefined) continue;
-          if (orig === null) el.removeAttribute(attr);
-          else el.setAttribute(attr, orig);
+        const rec = this.records.get(el);
+        const real = rec?.real ?? el.getAttribute(REAL_ATTR);
+        if (real) {
+          const alias = rec?.alias ?? this.aliases.get(real.toLowerCase());
+          if (alias) this.replaceText(el, alias, real);
+        }
+        // restore scrubbed attributes (only known for recorded elements)
+        if (rec) {
+          for (const attr of SCRUB_ATTRS) {
+            const orig = rec.attrs[attr];
+            if (orig === undefined) continue;
+            if (orig === null) el.removeAttribute(attr);
+            else el.setAttribute(attr, orig);
+          }
         }
         // un-hide title badges
         el.querySelectorAll<HTMLElement>('.utitle').forEach((t) => {
@@ -194,10 +216,18 @@ export class LichessMasker {
 
   private detectStreamer(): void {
     if (this.streamerKey) return;
-    const tag = document.getElementById('user_tag');
-    if (!tag) return;
-    const name = this.realNameOf(tag);
-    if (name) this.streamerKey = name.toLowerCase();
+    // Prefer the dasher's Profile link — it carries the real `/@/username` (or
+    // our cached real name), so it stays reliable even if the #user_tag button
+    // text was previously masked. Fall back to the button text.
+    const profile = document.querySelector<HTMLElement>(
+      '.dasher a.user-link, #dasher_app a[href^="/@/"], #dasher_app [data-href^="/@/"]',
+    );
+    let name = profile ? this.realNameOf(profile) : null;
+    if (!name || isOwnAlias(name)) {
+      const tag = document.getElementById('user_tag');
+      name = tag ? this.realNameOf(tag) : null;
+    }
+    if (name && !isOwnAlias(name)) this.streamerKey = name.toLowerCase();
   }
 
   private detectOpponent(): void {
@@ -224,7 +254,9 @@ export class LichessMasker {
    */
   private realNameOf(el: HTMLElement): string | null {
     const cached = el.getAttribute(REAL_ATTR);
-    if (cached) return cached;
+    // Ignore a cached value that is one of our own aliases — that means a stale
+    // previous session baked an alias in as the "real" name; re-derive instead.
+    if (cached && !isOwnAlias(cached)) return cached;
     return this.deriveReal(el);
   }
 
@@ -239,9 +271,11 @@ export class LichessMasker {
       if (m) return m[1];
     }
 
+    // Text-derived sources below can read text we already masked, so reject any
+    // result that is one of our own aliases.
     if (el.id === 'user_tag') {
       const m = (el.textContent ?? '').match(/[\w][\w-]{1,28}/);
-      if (m) return m[0];
+      if (m && !isOwnAlias(m[0])) return m[0];
     }
 
     // Plain-text username (mini-board / now-playing): the text with the title
@@ -250,7 +284,7 @@ export class LichessMasker {
       const clone = el.cloneNode(true) as HTMLElement;
       clone.querySelectorAll(NON_NAME_SELECTOR).forEach((n) => n.remove());
       const name = (clone.textContent ?? '').replace(/\s+/g, ' ').trim();
-      if (name) return name;
+      if (name && !isOwnAlias(name)) return name;
     }
 
     return null;
@@ -346,6 +380,13 @@ export class LichessMasker {
         continue;
       }
       m.addedNodes.forEach((node) => {
+        // A re-rendered text node (Lichess swapping a name back in) — re-mask
+        // its host so the alias is reapplied.
+        if (node.nodeType === Node.TEXT_NODE) {
+          const host = node.parentElement?.closest<HTMLElement>(CANDIDATE_SELECTOR);
+          if (host) this.maskElement(host);
+          return;
+        }
         if (node.nodeType !== Node.ELEMENT_NODE) return;
         const el = node as HTMLElement;
         if (el.matches?.(CANDIDATE_SELECTOR)) this.maskElement(el);

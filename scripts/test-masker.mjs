@@ -3,8 +3,14 @@
 import { JSDOM } from 'jsdom';
 
 const HTML = `<!doctype html><html><head></head><body>
-  <!-- top bar: the logged-in user (the streamer) -->
-  <div id="user_tag" class="toggle link">PenguinBlitz</div>
+  <!-- top bar dasher: button shows the name (text only); the Profile link in
+       the dropdown carries the real /@/ username -->
+  <div class="dasher">
+    <button id="user_tag" class="toggle link">PenguinBlitz</button>
+    <div id="dasher_app" class="dropdown">
+      <a class="user-link online" href="/@/PenguinBlitz"><icon class="line"></icon>Profile</a>
+    </div>
+  </div>
 
   <!-- a game: streamer is bottom, opponent is top -->
   <div class="ruser ruser-top">
@@ -103,6 +109,8 @@ const visibleText = (sel) => {
 
 // --- enabled assertions ---
 check('streamer tag relabelled', text('#user_tag'), 'Streamer');
+check('user_tag cached real name is real, not alias', attr('#user_tag', 'data-sm-real'), 'PenguinBlitz');
+check('dasher Profile label untouched', text('#dasher_app a.user-link'), 'Profile');
 check('opponent visible name (GM badge hidden)', visibleText('.ruser-top a'), 'Opponent');
 check('streamer (bottom player) relabelled', text('.ruser-bottom a'), 'Streamer');
 check('opponent href scrubbed', attr('.ruser-top a', 'href'), null);
@@ -160,6 +168,15 @@ await new Promise((r) => setTimeout(r, 50));
 check('board name re-masked after revert', visibleText('.ruser-top a'), 'Opponent');
 check('no feedback-loop corruption of streamer tag', text('#user_tag'), 'Streamer');
 
+// --- re-render via text-node REPLACEMENT (not in-place): Lichess removes the
+//     name text node and inserts a fresh one with the real name. We must catch
+//     the added text node and re-mask its host. ---
+const tagNode = document.getElementById('user_tag');
+[...tagNode.childNodes].forEach((n) => n.nodeType === 3 && n.remove());
+tagNode.appendChild(document.createTextNode('PenguinBlitz')); // fresh real-name node
+await new Promise((r) => setTimeout(r, 50));
+check('streamer tag re-masked after text-node replacement', text('#user_tag'), 'Streamer');
+
 // --- disable restores everything ---
 masker.disable();
 check('disable restores streamer tag', text('#user_tag'), 'PenguinBlitz');
@@ -176,6 +193,26 @@ check('disable restores mini-game GM badge', mg.querySelector('.utitle').style.d
 check('disable restores seek data-href', attr('.hooks__list tr:nth-child(1) td span', 'data-href'), '/@/thedemon44');
 check('disable restores seek name', text('.hooks__list tr:nth-child(1) td span'), 'thedemon44');
 check('disable restores now-playing name', document.querySelector('.now-playing .meta').textContent.includes('Comrade001'), true);
+
+// --- corruption resistance: simulate a stale session that left the #user_tag
+//     button showing an alias. A fresh enable must NOT bake "Streamer" in as
+//     the real name — it should detect the streamer from the dasher Profile
+//     link (which still has the real /@/ href) and leave the button's bad
+//     cached value out. ---
+document.getElementById('user_tag').textContent = 'Streamer'; // leftover alias
+const masker2 = new LichessMasker();
+masker2.enable();
+check(
+  'corruption: user_tag NOT re-derived as the alias',
+  attr('#user_tag', 'data-sm-real') === 'Streamer',
+  false,
+);
+check(
+  'corruption: streamer still detected from Profile link',
+  attr('#dasher_app a.user-link', 'data-sm-real'),
+  'PenguinBlitz',
+);
+masker2.disable();
 
 console.log(`\n${failures === 0 ? 'ALL PASSED' : failures + ' FAILED'}`);
 process.exit(failures === 0 ? 0 : 1);
