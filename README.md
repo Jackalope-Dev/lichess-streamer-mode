@@ -75,6 +75,25 @@ npm run zip:firefox    # store-ready zip (Firefox)
 - **Firefox:** go to `about:debugging#/runtime/this-firefox`,
   *Load Temporary Add-on* → select any file in `.output/firefox-mv2`.
 
+## Building from source (for Firefox AMO reviewers)
+
+This add-on is bundled and minified with [WXT](https://wxt.dev) (Vite + rolldown),
+so the published files are generated. To reproduce them from the source archive:
+
+- **Environment:** Node.js 22 LTS and npm 10 (developed on Node 22.13.1 / npm 10.9.2),
+  on any OS. No global tools required; everything installs locally.
+
+```bash
+npm ci                 # install exact, locked dependencies
+npm run build:firefox  # produces the unpacked extension in .output/firefox-mv2
+```
+
+The contents of `.output/firefox-mv2/` match the uploaded package. (`npm run zip:firefox`
+simply zips that folder.) No network access or environment variables are needed at
+build time. The platform-specific entries under `optionalDependencies` are native
+build-tool binaries for Windows only; npm automatically selects the correct binaries
+for the reviewer's platform and skips the rest.
+
 ## Project layout
 
 ```
