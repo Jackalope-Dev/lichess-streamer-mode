@@ -1,4 +1,10 @@
-# Streamer Mode for Lichess
+<div align="center">
+  <img src="public/icon/128.png" alt="Streamer Mode for Lichess" width="128" />
+
+  # Streamer Mode for Lichess
+
+  [![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4sCIILO7Ok2XaiUa.png)](https://chromewebstore.google.com/detail/streamer-mode-for-lichess/geeapagaajpjlnenfongaecamhknbokc)
+</div>
 
 A cross-browser extension that hides **every username** on [lichess.org](https://lichess.org)
 with one click — so chess streamers can play without leaking their identity,
